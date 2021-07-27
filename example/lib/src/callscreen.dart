@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:developer';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -44,11 +46,16 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
 
   Call get call => widget._call;
 
+  String get xFSSupport => call.xFSSupport;
+
+  String get xIndihomeNumber => call.xIndihomeNumber;
+
   @override
   initState() {
     super.initState();
     _initRenderers();
     helper.addSipUaHelperListener(this);
+    log("DEBUG: voice only: ${voiceonly}");
     _startTimer();
   }
 
@@ -146,7 +153,9 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
   }
 
   @override
-  void transportStateChanged(TransportState state) {}
+  void transportStateChanged(TransportState state) {
+    log("DEBUG: callscreen: transport state changed: ${state.toString()}");
+  }
 
   @override
   void registrationStateChanged(RegistrationState state) {}
@@ -164,7 +173,12 @@ class _MyCallScreenWidget extends State<CallScreenWidget>
       if (_localRenderer != null) {
         _localRenderer.srcObject = stream;
       }
-      event.stream?.getAudioTracks()?.first?.enableSpeakerphone(false);
+      // event.stream?.getAudioTracks()?.first?.enableSpeakerphone(false);
+      if (kIsWeb) {
+        event.stream?.getAudioTracks()?.first?.enabled = true;
+      } else {
+        event.stream?.getAudioTracks()?.first?.enableSpeakerphone(false);
+      }
       _localStream = stream;
     }
     if (event.originator == 'remote') {

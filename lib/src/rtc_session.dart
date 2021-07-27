@@ -115,6 +115,10 @@ class RTCSession extends EventManager {
     _end_time = null;
     _tones = null;
 
+    // Custom SIP Header
+    _xFSSupport = null;
+    _xIndihomeNumber = null;
+
     // Mute/Hold state.
     _audioMuted = false;
     _videoMuted = false;
@@ -163,6 +167,8 @@ class RTCSession extends EventManager {
   bool _localMediaStreamLocallyGenerated;
   bool _rtcReady;
   String _direction;
+  String _xFSSupport;
+  String _xIndihomeNumber;
 
   Map<int, ReferSubscriber> _referSubscribers;
   DateTime _start_time;
@@ -213,6 +219,10 @@ class RTCSession extends EventManager {
   UA get ua => _ua;
 
   int get status => _status;
+
+  String get xFSSupport => _xFSSupport;
+
+  String get xIndihomeNumber => _xIndihomeNumber;
 
   bool isInProgress() {
     switch (_status) {
@@ -432,6 +442,17 @@ class RTCSession extends EventManager {
     _direction = 'incoming';
     _local_identity = request.to;
     _remote_identity = request.from;
+
+    // Test get custom SIP Header
+    if (request.hasHeader('X-FS-Support')) {
+      _xFSSupport = request.getHeader('X-FS-Support');
+      logger.info('X-FS-Support value is $_xFSSupport');
+    }
+
+    if (request.hasHeader('X-INDIHOME-NUMBER')) {
+      _xIndihomeNumber = request.getHeader('X-INDIHOME-NUMBER');
+      logger.info('X-INDIHOME-NUMBER value is $_xIndihomeNumber');
+    }
 
     // A init callback was specifically defined.
     if (initCallback != null) {
@@ -1596,7 +1617,7 @@ class RTCSession extends EventManager {
     switch (sdpSemantics) {
       case 'unified-plan':
         _connection.onTrack = (RTCTrackEvent event) {
-          if (event.track.kind == 'video' && event.streams.isNotEmpty) {
+          if (event.streams.isNotEmpty) {
             emit(EventStream(
                 session: this, originator: 'remote', stream: event.streams[0]));
           }

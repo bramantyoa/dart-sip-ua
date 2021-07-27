@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:logger/logger.dart';
 import 'package:sip_ua/src/rtc_session/refer_subscriber.dart';
+import 'dart:developer';
 
 import 'config.dart';
 import 'constants.dart' as DartSIP_C;
@@ -156,6 +157,10 @@ class SIPUAHelper extends EventManager {
         logger.debug('newRTCSession => ' + event.toString());
         RTCSession session = event.session;
         if (session.direction == 'incoming') {
+          logger.info(
+              'newRTCSession incoming with X-FS-Support value ${session.xFSSupport}');
+          logger.info(
+              'newRTCSession incoming with X-INDIHOME-NUMBER value ${session.xIndihomeNumber}');
           // Set event handlers.
           session.addAllEventHandlers(
               buildCallOptions()['eventHandlers'] as EventManager);
@@ -168,8 +173,10 @@ class SIPUAHelper extends EventManager {
 
       _ua.on(EventNewMessage(), (EventNewMessage event) {
         logger.debug('newMessage => ' + event.toString());
+        log("DEBUG: sip_ua_helper: EventNewMessage(): event = ${event.toString()}");
         //Only notify incoming message to listener
         if (event.message.direction == 'incoming') {
+          log("DEBUG: sip_ua_helper: EventNewMessage(): INCOMING event = ${event.toString()}");
           SIPMessageRequest message =
               SIPMessageRequest(event.message, event.originator, event.request);
           _notifyNewMessageListeners(message);
@@ -469,6 +476,23 @@ class Call {
     assert(_session != null, 'ERROR(get direction): rtc session is invalid!');
     if (_session.direction != null) {
       return _session.direction.toUpperCase();
+    }
+    return '';
+  }
+
+  String get xFSSupport {
+    assert(_session != null, 'ERROR(get xFSSupport): rtc session is invalid!');
+    if (_session.xFSSupport != null) {
+      return _session.xFSSupport;
+    }
+    return '';
+  }
+
+  String get xIndihomeNumber {
+    assert(
+        _session != null, 'ERROR(get xIndihomeNumber: rtc session is invalid!');
+    if (_session.xIndihomeNumber != null) {
+      return _session.xIndihomeNumber;
     }
     return '';
   }

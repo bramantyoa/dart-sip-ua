@@ -17,8 +17,8 @@ class _MyRegisterWidget extends State<RegisterWidget>
   TextEditingController _displayNameController = TextEditingController();
   TextEditingController _authorizationUserController = TextEditingController();
   Map<String, String> _wsExtraHeaders = {
-    'Origin': ' https://tryit.jssip.net',
-    'Host': 'tryit.jssip.net:10443'
+    'Origin': ' https://indiphone.id',
+    'Host': 'indiphone.id:7443',
   };
   SharedPreferences _preferences;
   RegistrationState _registerState;
@@ -44,13 +44,15 @@ class _MyRegisterWidget extends State<RegisterWidget>
     _preferences = await SharedPreferences.getInstance();
     this.setState(() {
       _wsUriController.text =
-          _preferences.getString('ws_uri') ?? 'wss://tryit.jssip.net:10443';
+          _preferences.getString('ws_uri') ?? 'wss://indiphone.id:7443';
       _sipUriController.text =
-          _preferences.getString('sip_uri') ?? 'hello_flutter@tryit.jssip.net';
+          _preferences.getString('sip_uri') ?? '02150867128@indiphone.id';
       _displayNameController.text =
           _preferences.getString('display_name') ?? 'Flutter SIP UA';
-      _passwordController.text = _preferences.getString('password');
-      _authorizationUserController.text = _preferences.getString('auth_user');
+      _passwordController.text =
+          _preferences.getString('password') ?? 'pwd02150867128';
+      _authorizationUserController.text =
+          _preferences.getString('auth_user') ?? '02150867128';
     });
   }
 

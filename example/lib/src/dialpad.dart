@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:sip_ua/sip_ua.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -30,7 +32,7 @@ class _MyDialPadWidget extends State<DialPadWidget>
 
   void _loadSettings() async {
     _preferences = await SharedPreferences.getInstance();
-    _dest = _preferences.getString('dest') ?? 'sip:hello_jssip@tryit.jssip.net';
+    _dest = _preferences.getString('dest');
     _textController = TextEditingController(text: _dest);
     _textController.text = _dest;
 
@@ -274,11 +276,19 @@ class _MyDialPadWidget extends State<DialPadWidget>
   }
 
   @override
-  void transportStateChanged(TransportState state) {}
+  void transportStateChanged(TransportState state) {
+    log("DEBUG: dialpad: transport state changed: ${state.toString()}");
+  }
 
   @override
   void callStateChanged(Call call, CallState callState) {
     if (callState.state == CallStateEnum.CALL_INITIATION) {
+      log("[DEBUG] callStateChanged - call_initiation, xFSSupport: ${call.xFSSupport}");
+      print(
+          "[DEBUG] callStateChanged - call_initiation, xFSSupport: ${call.xFSSupport}");
+      log('[DEBUG] callStateChanged - call_initiation from ${call.remote_identity}, xIndihomeNumber: ${call.xIndihomeNumber}');
+      print(
+          '[DEBUG] callStateChanged - call_initiation from ${call.remote_identity}, xIndihomeNumber: ${call.xIndihomeNumber}');
       Navigator.pushNamed(context, '/callscreen', arguments: call);
     }
   }
